@@ -1,30 +1,31 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'Next.js Starter Blog',
-  author: 'Tails Azimuth',
-  headerTitle: 'TailwindBlog',
-  description: 'A blog created with Next.js and Tailwind.css',
+  title: 'Ben Glasser',
+  author: 'Ben Glasser',
+  headerTitle: 'Ben Glasser',
+  description:
+    'A blog about the trials and tribulations of software development with a few side projects thrown in for good measure',
   language: 'en-us',
   theme: 'system', // system, dark or light
-  siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
-  siteRepo: 'https://github.com/timlrx/tailwind-nextjs-starter-blog',
+  siteUrl: 'https://blog.benglasser.com',
+  siteRepo: 'https://github.com/benglasser/blog',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo.png`,
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
   mastodon: 'https://mastodon.social/@mastodonuser',
-  email: 'address@yoursite.com',
-  github: 'https://github.com',
-  x: 'https://twitter.com/x',
+  email: 'Ben@BenGlasser.com',
+  github: 'https://github.com/benglasser',
+  x: 'https://twitter.com/benglasser',
   // twitter: 'https://twitter.com/Twitter',
   facebook: 'https://facebook.com',
   youtube: 'https://youtube.com',
-  linkedin: 'https://www.linkedin.com',
+  linkedin: 'https://www.linkedin.com/in/benglasser',
   threads: 'https://www.threads.net',
   instagram: 'https://www.instagram.com',
   medium: 'https://medium.com',
   bluesky: 'https://bsky.app/',
   locale: 'en-US',
   // set to true if you want a navbar fixed to the top
-  stickyNav: false,
+  stickyNav: true,
   analytics: {
     // If you want to use an analytics provider you have to add it to the
     // content security policy in the `next.config.js` file.
@@ -73,9 +74,9 @@ const siteMetadata = {
       metadata: '0',
       // theme example: light, dark, dark_dimmed, dark_high_contrast
       // transparent_dark, preferred_color_scheme, custom
-      theme: 'light',
+      theme: 'catppuccin_macchiato',
       // theme when dark mode
-      darkTheme: 'transparent_dark',
+      darkTheme: 'catppuccin_macchiato',
       // If the theme option above is set to 'custom`
       // please provide a link below to your custom theme css file.
       // example: https://giscus.app/themes/custom_example.css

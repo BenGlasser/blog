@@ -1,0 +1,130 @@
+---
+title: Setting up code coverage reporting with GitHub Actions
+date: '2025-05-14'
+tags: ['github', 'configuration', 'personal notes']
+draft: false
+summary: A debriefing of my exprience setting up code coverage reports for a NodeJS project using vitest in github actions
+---
+
+# 🚀 Streamlining Vitest Coverage Reports in GitHub Actions
+
+Recently, I tackled one of those tasks that starts out sounding simple—"just wire up code coverage in CI"—but inevitably grows into a mini saga. The goal was clear: get reliable, clean **code coverage reports** that show up right in GitHub pull requests, tied to actual changes, and easy on the eyes.
+
+Our stack uses **Vitest**, so I needed something that supported its output without a bunch of glue code. After exploring a few options, I landed on [`vitest-coverage-report-action`](https://github.com/davelosert/vitest-coverage-report-action), and let me tell you: it's **exactly** what I was looking for.
+
+---
+
+## 🎯 Goals
+
+Here's what I set out to achieve:
+
+### ✅ Clean, simple code coverage reporting
+
+I didn't want charts. I didn't want dashboards. I just wanted a nice little table in the PR that told me what changed, and how much of it is covered. And this action delivers—beautifully.
+
+### ✅ Native support for Vitest coverage output
+
+Many tools are generalized or tuned for Jest. This one is explicitly built with Vitest in mind and supports its `coverage-final.json` and `coverage-summary.json` outputs directly.
+
+No adapters, no conversions, no config calisthenics.
+
+### ✅ Automatic PR comments
+
+Coverage reports belong where the conversation is—**in the pull request**. This action posts a markdown-formatted comment with your coverage summary, and **updates it automatically** as new commits land.
+
+It avoids comment spam by editing in place, which is a small but mighty quality-of-life win.
+
+### ✅ Coverage gating (threshold-based failure)
+
+Sometimes coverage is just information. Sometimes it's policy. With this action, you can decide when to **fail the build** based on minimum thresholds—like line, branch, or function coverage.
+
+Use it to encourage healthy habits or enforce hard gates. Your call.
+
+### ✅ Human-friendly formatting
+
+The default report is compact, colorful, and clear. You get percentages, covered/total counts, and visual cues with emojis. The info is digestible at a glance—even for someone casually reviewing the PR.
+
+### ✅ Focused reporting on changed files
+
+The **killer feature**: `file-coverage-mode: changes`.
+
+This scopes the report to just the files modified in the pull request. It keeps noise down and makes the data actionable. You don't need to fix legacy coverage to get useful feedback on new work.
+
+---
+
+## 🧪 Final GitHub Actions Workflow
+
+This is the final version I ended up with.
+
+```yaml
+name: Coverage Report
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  server-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Required for full git history and diff tracking
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 23.6.1
+          cache: 'yarn'
+          cache-dependency-path: '**/yarn.lock'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests and generate coverage
+        run: cd server && npx vitest run --coverage.enabled true
+
+      - name: Report server coverage
+        if: always()  # Ensure this step runs even if tests fail
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          name: Server
+          github-token: ${{ secrets.BEN_LOVES_SECRETS }}
+          vite-config-path: server/vitest.config.ts
+          json-summary-path: server/coverage/coverage-summary.json
+          json-final-path: server/coverage/coverage-final.json
+          pr-number: ${{ github.event.pull_request.number }}
+          file-coverage-mode: changes
+          comment-on: pr
+```
+
+---
+
+## 🖼️ Example Output
+
+Here's what the PR comment looks like in action:
+
+![GitHub PR comment with coverage report](/static/images/blog/coverage-report.png)
+
+It shows:
+
+- **Coverage by category** (lines, statements, functions, branches)
+- **Target indicators** with 🎯 emojis when thresholds are hit or missed
+- A link to the workflow run and the commit it came from
+- A toggleable section for **file-specific** coverage breakdowns
+
+Even with a large codebase and low initial coverage, this gives a clear baseline and immediately surfaces what's changing.
+
+---
+
+## 🏁 Final Thoughts
+
+This action nails the sweet spot between minimalism and functionality.
+
+It takes just a few minutes to configure, works seamlessly with Vitest, and quietly becomes a reliable part of your PR workflow. The focused file coverage mode is a standout feature, and the formatting is polished enough that I've never felt the need to customize it.
+
+If you're using Vitest and care about visibility, quality, and reviewer ergonomics—this is a fantastic addition to your CI pipeline.
+
+---
+
+> Give it a spin: [vitest-coverage-report-action on GitHub](https://github.com/davelosert/vitest-coverage-report-action)
