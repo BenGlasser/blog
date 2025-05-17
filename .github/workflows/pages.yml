@@ -34,6 +34,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-
       - run: yarn
+      - name: Ensure out directory exists
+        run: mkdir -p ./out
       - run: EXPORT=1 UNOPTIMIZED=1 yarn build
         env:
           EXPORT: 1
