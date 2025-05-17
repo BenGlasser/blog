@@ -1,0 +1,257 @@
+---
+title: Building an Audio-Reactive Starfield Visualizer in Unity
+date: '2025-05-16'
+tags: ['unity', 'shaders', 'HLSL', 'projects', 'vizualization']
+draft: false
+summary: A deep dive into the development of a real-time audio visualization project in Unity, featuring custom HLSL shaders and ripple effects.
+---
+
+# Building an Audio-Reactive Starfield Visualizer in Unity
+
+> _A technical and creative journey through audio-driven graphics, custom shaders, and the process of building a mesmerizing visualizer from scratch._
+
+![Starfield Visualizer Screenshot](/static/images/blog/starfield.gif)
+
+---
+
+## Introduction
+
+There’s something magical about watching music come alive visually. As a graphics programmer and audio enthusiast, I’ve always been fascinated by the challenge of translating sound into captivating, real-time visuals. This post is a deep dive into the making of my **Starfield Visualizer**—a Unity project that transforms audio into a swirling, twinkling starfield, complete with rippling post-processing effects. Along the way, I’ll share the technical details, creative decisions, and lessons learned, with the hope of inspiring others to explore the intersection of audio and graphics.
+
+---
+
+## The Spark: Inspiration and Early Experiments
+
+The idea for this project began with a simple question: _What if a starfield could dance to music?_ I wanted to create something that felt both cosmic and reactive—a visualizer that didn’t just pulse to the beat, but shimmered, rippled, and evolved with the sound.
+
+My first experiments were humble: I started by setting up a basic Unity scene and writing a script to analyze audio input. The goal was to break down the audio spectrum into frequency bands, which could then be mapped to visual parameters. This process, known as audio feature extraction, is the backbone of most music visualizers.
+
+---
+
+## From Audio to Data: The Analysis Pipeline
+
+### Breaking Down the Sound
+
+The core of the analysis is handled by a custom `AudioEngine` script. This script uses Unity’s `AudioSource.GetSpectrumData` to capture the frequency spectrum of the audio in real time. The spectrum is then divided into 8 logarithmically spaced frequency bands, each representing a different part of the audio range—from deep bass to shimmering highs.
+
+```csharp
+// Inside AudioEngine.cs
+void MakeFrequencyBands()
+{
+    int count = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        float average = 0;
+        int sampleCount = (int)Mathf.Pow(2, i) * 2;
+        if (i == 7) sampleCount += 2;
+        for (int j = 0; j < sampleCount; j++)
+        {
+            average += samples[count] * (count + 1);
+            count++;
+        }
+        average /= count;
+        freqBand[i] = average * 10;
+    }
+}
+```
+
+To make the visuals smooth and responsive, I implemented a buffering system that tracks the highest value for each band and decays it over time. This prevents the visuals from flickering and gives them a more organic feel.
+
+### Normalizing and Sharing the Data
+
+The frequency bands are normalized against their historical maximums, producing values between 0 and 1. These are exposed as static arrays, making them accessible from anywhere in the project:
+
+```csharp
+public static float[] audioBand = new float[8];
+public static float[] audioBandBuffer = new float[8];
+```
+
+---
+
+## Connecting Audio to Visuals: Unity Integration
+
+### Sending Data to Shaders
+
+With the audio data ready, the next step was to get it into the GPU. Unity makes this surprisingly straightforward. Scripts like `CameraEffect` and `SurfaceEffect` grab the audio bands and send them to the shader as a float array every frame:
+
+```csharp
+void Update()
+{
+    float[] bands = AudioEngine.audioBandBuffer;
+    material.SetFloatArray("_Bands", bands);
+}
+```
+
+This tight coupling between audio and graphics is what enables the real-time, music-driven visuals.
+
+### The Role of Materials and Render Pipeline
+
+Each visual effect in the project is driven by a custom material, which in turn is powered by a shader. The main camera uses a post-processing script to apply the ripple effect, while the starfield is rendered as a fullscreen quad. This separation of concerns makes it easy to layer and combine effects.
+
+---
+
+## The Heartbeat: Designing the Starfield Shader
+
+### Goals and Challenges
+
+I wanted the starfield to feel alive—stars should twinkle, drift, and pulse with the music. Achieving this required a blend of procedural generation, mathematical tricks, and careful tuning.
+
+### Anatomy of the Shader
+
+The `StarfieldShader` is written in HLSL, Unity’s preferred shading language. Here’s a breakdown of its key components:
+
+#### 1. Normalizing UVs
+
+The shader starts by normalizing the UV coordinates so that the effect scales correctly across different screen sizes:
+
+```hlsl
+v.uv = ((v.uv - .5)  * _ScreenParams.xy) / _ScreenParams.y;
+v.uv *= 3.0; // zoom scalar
+```
+
+#### 2. Procedural Star Generation
+
+Stars are generated procedurally by tiling space into a grid. For each cell, a pseudo-random offset determines the star’s position, size, and color. The `hash21` function is used to create repeatable randomness:
+
+```hlsl
+float hash21(float2 p)
+{
+    p = frac(p * float2(123.34, 456.21));
+    p += dot(p, p + 23.45);
+    return frac(p.x * p.y);
+}
+```
+
+#### 3. Drawing and Animating Stars
+
+The `makeStar` function creates the star’s shape, with a central glow and radiating rays. It also adds a twinkle effect by modulating brightness with a sine wave based on time and randomness:
+
+```hlsl
+float makeStar(float2 uv, float flair, float intensity, float ray_size)
+{
+    float d = length(uv);
+    float m = intensity / d;
+    uv =  rot(uv, _Time * -4);
+    float rays = max(0, 1 - abs(uv.x * uv.y * ray_size));
+    m += rays * flair;
+    m *= smoothstep(1, .2, d);
+    return m;
+}
+```
+
+#### 4. Audio Reactivity
+
+The real magic happens when the audio bands are used to modulate star properties. For example, stars with a strong red component are made to pulse with the bass, while blue stars respond to higher frequencies:
+
+```hlsl
+if (normalized_color.r > 0.5) star *= 2*_Bands[1];
+if (normalized_color.b > 0.5) star *= 2*_Bands[5];
+if (normalized_color.g > normalized_color.r && normalized_color.g>normalized_color.b) color = float3(1,1,1)*_Bands[7];
+```
+
+#### 5. Layering for Depth
+
+To create a sense of depth and parallax, the shader renders multiple layers of stars, each with its own zoom and fade. This gives the illusion of drifting through a 3D starfield:
+
+```hlsl
+for (float g = 0; g < 1; g+= 1.0 / _Num_Layers)
+{
+    float depth = frac(g + time);
+    float scale = lerp(_Layer_Zoom, .5, depth);
+    float fade = depth * smoothstep(1, .9, depth);
+    col += starLayer(i.uv * scale + g*453.2) * fade;
+}
+```
+
+#### 6. Twinkling and Animation
+
+Stars are made to twinkle by modulating their brightness with a sine wave, synchronized to both time and their random offset. This creates a lively, ever-changing field of light.
+
+---
+
+## Ripples: Audio-Driven Post-Processing
+
+The starfield is only part of the story. To add another layer of immersion, I implemented a custom ripple shader as a post-processing effect. This shader distorts the screen with concentric ripples that pulse in sync with the music’s energy.
+
+### How the Ripple Shader Works
+
+The ripple effect is achieved by offsetting the UV coordinates based on a sine wave, whose frequency and amplitude are modulated by the audio bands:
+
+```hlsl
+float len = length(newUV);
+float finalRing = smoothstep(0,1,sin(len * 5 - timer) * 0.5 + 0.5);
+float2 finalUV = i.uv - newUV * finalRing * _RippleIntensity;
+fixed4 col = tex2D(_MainTex, finalUV);
+```
+
+The result is a hypnotic, water-like distortion that ebbs and flows with the music.
+
+---
+
+## Creative Process: Iteration, Challenges, and Happy Accidents
+
+No project is without its hurdles. Early on, I struggled with synchronizing the audio data and the visuals—timing issues would cause the stars to lag behind the beat, or the ripples to stutter. Debugging shaders can be especially tricky, since errors often manifest as black screens or wild, unpredictable visuals.
+
+One breakthrough came when I realized that smoothing the audio bands (using a buffer that decays over time) made the visuals feel much more natural. Another was the discovery that layering multiple starfields with different zoom factors created a convincing sense of depth, even in 2D.
+
+Performance was another concern. Procedural generation and multiple layers can be taxing on the GPU, especially at high resolutions. I spent time profiling the shader and optimizing math operations, reducing unnecessary calculations, and minimizing texture lookups.
+
+---
+
+## GLSL vs HLSL: Shader Languages in Context
+
+Shader programming is dominated by two languages: **GLSL** (OpenGL Shading Language) and **HLSL** (High-Level Shading Language).
+
+- **GLSL** was developed for OpenGL and is widely used in cross-platform graphics, especially in web and open-source projects.
+- **HLSL** was created by Microsoft for DirectX and is the default for Windows-based graphics.
+
+**Similarities:**
+
+- Both are C-like languages designed for GPU programming.
+- Both support vertex, fragment/pixel, and compute shaders.
+- Syntax and structure are very similar, with minor differences in types and built-in functions.
+
+**Differences:**
+
+- GLSL is more closely tied to OpenGL, while HLSL is for DirectX.
+- Some function names and semantics differ (e.g., `texture2D` in GLSL vs `tex2D` in HLSL).
+- HLSL has more integration with Microsoft’s graphics stack.
+
+**Unity’s Approach:**
+Unity uses a variant of HLSL for its shaders, even on platforms that use OpenGL under the hood. This means Unity shaders are written in HLSL syntax, but Unity’s shader compiler handles cross-compilation to GLSL or Metal as needed.
+
+- [Unity Shader Reference](https://docs.unity3d.com/Manual/SL-ShaderPrograms.html)
+- [GLSL Documentation](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)
+- [HLSL Documentation](https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl)
+
+---
+
+## Extending the Visualizer: Ideas for Exploration
+
+One of the joys of building a project like this is the endless room for experimentation. Here are a few ideas for taking the visualizer further:
+
+- **Custom Color Palettes:** Map different audio bands to unique color schemes for more dramatic effects.
+- **3D Starfields:** Use Unity’s 3D capabilities to create a volumetric starfield.
+- **Interactive Controls:** Let users tweak parameters like star density, ripple speed, or color in real time.
+- **Multiple Audio Sources:** Visualize different instruments or tracks separately.
+- **VR/AR Support:** Bring the starfield into immersive environments.
+
+---
+
+## Example Video
+
+<YouTube id="ds9UhMriTRY?si=GKIuoD3rpTTWVdpV" />
+
+---
+
+## Conclusion: Lessons Learned and Final Thoughts
+
+Building the Starfield Visualizer was a rewarding journey through audio analysis, shader programming, and creative iteration. I learned the importance of smoothing data, the power of procedural generation, and the value of patience when debugging complex visual effects. Most of all, I was reminded that the best results often come from playful experimentation and a willingness to embrace happy accidents.
+
+If you’re interested in graphics programming, audio visualization, or just want to see your music in a new light, I encourage you to dive in and start experimenting. The intersection of sound and visuals is a playground for creativity—and there’s always more to discover.
+
+Feel free to explore the [source code on GitHub](https://github.com/BenGlasser/Starfield-Visualizer) and try building your own audio-reactive effects!
+
+---
+
+_Thanks for reading! If you have questions or want to share your own visualizations, leave a comment below or reach out on social media._

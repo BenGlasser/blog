@@ -1,4 +1,9 @@
 {
+  "unity": 1,
+  "shaders": 1,
+  "hlsl": 1,
+  "projects": 1,
+  "vizualization": 1,
   "github": 2,
   "configuration": 1,
   "personal-notes": 2,

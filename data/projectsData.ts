@@ -7,12 +7,11 @@ interface Project {
 
 const projectsData: Project[] = [
   {
-    title: 'A Search Engine',
-    description: `What if you could look up any information in the world? Webpages, images, videos
-    and more. Google has many features to help you find exactly what you're looking
-    for.`,
-    imgSrc: '/static/images/google.png',
-    href: 'https://www.google.com',
+    title: 'Audio-Reactive Starfield Visualizer in Unity',
+    description: `A deep dive into the development of a real-time audio visualization project in Unity, 
+    featuring custom HLSL shaders and ripple effects.`,
+    imgSrc: '/static/images/blog/starfield.gif',
+    href: '/blog/20250516-StarfieldVisualizer',
   },
   {
     title: 'The Time Machine',
