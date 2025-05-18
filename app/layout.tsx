@@ -17,7 +17,6 @@ const space_grotesk = Space_Grotesk({
   display: 'swap',
   variable: '--font-space-grotesk',
 })
-
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
   title: {
@@ -55,6 +54,11 @@ export const metadata: Metadata = {
     title: siteMetadata.title,
     card: 'summary_large_image',
     images: [siteMetadata.socialBanner],
+  },
+  verification: {
+    other: {
+      'google-site-verification': '72HlL5aNeTStJZwQFi2zWsixXF8yzeRimQNI9sPTWGk',
+    },
   },
 }
 
