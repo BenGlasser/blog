@@ -48,7 +48,7 @@ const siteMetadata = {
     // },
     googleAnalytics: {
       googleAnalyticsId: 'G-C1N3TP97HB', // e.g. G-XXXXXXX
-    // },
+    },
   },
   newsletter: {
     // supports mailchimp, buttondown, convertkit, klaviyo, revue, emailoctopus, beehive
