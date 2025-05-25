@@ -6,7 +6,7 @@ const siteMetadata = {
   description:
     'A blog about the trials and tribulations of software development with a few side projects thrown in for good measure',
   language: 'en-us',
-  theme: 'system', // system, dark or light
+  theme: 'dark', // system, dark or light
   siteUrl: 'https://BenGlasser.com',
   siteRepo: 'https://github.com/benglasser/blog',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/BG-512x512.png`,
