@@ -126,59 +126,6 @@ end
 
 The blockchain is just a list with the newest block at the front - works well with Elixir's list structure.
 
-## Debugging Fun
-
-When I first got everything together, all the tests were failing. Turned out there were several issues that needed fixing:
-
-### Timestamp Issues
-
-The code was using Unix timestamps but tests expected `NaiveDateTime` objects:
-
-```elixir
-# Wrong
-timestamp: DateTime.utc_now() |> DateTime.to_unix()
-
-# Right
-timestamp: NaiveDateTime.utc_now()
-```
-
-### Genesis Block Problems
-
-Tests expected genesis blocks to have `prev_hash: "ZERO_HASH"`, not `nil`.
-
-### Hash Format Problems
-
-Had mixed uppercase/lowercase hashes, needed to standardize on uppercase.
-
-### Function Pattern Conflicts
-
-Two `hash/1` functions with overlapping patterns:
-
-```elixir
-# This never gets called!
-def hash(%{} = block) do ... end
-
-def hash(data) do ... end  # Matches everything first
-```
-
-Fixed by making the block pattern more specific: `hash(%Block{} = block)`.
-
-### Validation Logic Bug
-
-The validation logic had the parameters backwards:
-
-```elixir
-# Wrong
-defp validate_chain([block | [prev_block | _] = rest]) do
-  Block.valid?(block, prev_block) && validate_chain(rest)
-end
-
-# Right
-defp validate_chain([prev_block | [current_block | _] = rest]) do
-  Block.valid?(prev_block) && Block.valid?(current_block, prev_block) && validate_chain(rest)
-end
-```
-
 ## Why Elixir Works Well
 
 A few things that made this easier in Elixir:
@@ -200,10 +147,6 @@ defp validate_chain([prev_block | [current_block | _] = rest]) do
   validate_chain(rest)
 end
 ```
-
-### Testing
-
-Pure functions make testing straightforward.
 
 ## What's Missing
 
