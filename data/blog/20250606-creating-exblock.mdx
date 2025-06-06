@@ -1,0 +1,293 @@
+---
+title: Building a Simple Blockchain in Elixir
+date: '2026-06-06'
+tags: ['blockchain', 'elixir']
+draft: false
+summary: A straightforward implementation of basic blockchain concepts for learning purposes.
+---
+
+## Introduction
+
+Blockchains are pretty interesting from a technical perspective, and while the production ones like Bitcoin are super complex, the core ideas are actually pretty simple. This is ExBlock - a basic blockchain I built in Elixir to understand how the fundamental pieces work. It's nothing fancy, just a clean implementation of the essential concepts in about 200 lines of code.
+
+## What ExBlock Does
+
+This is a simple blockchain that covers the basics:
+
+- **Cryptographic Hashing**: SHA256 to validate blocks
+- **Chain Integrity**: Blocks link to each other through hashes
+- **Genesis Blocks**: The first block that starts the chain
+- **Data Storage**: You can put arbitrary data in blocks
+- **Validation**: Check if a blockchain is valid or corrupted
+- **Functional Design**: Clean Elixir code that's easy to test
+
+The project has four main modules:
+
+- `Block` - Individual block structure and validation
+- `Crypto` - Cryptographic hashing functions
+- `Blockchain` - Chain operations and validation
+- `ExBlock` - Main application module
+
+## Technical Implementation
+
+### Block Structure
+
+Every blockchain needs blocks. Here's what our blocks look like:
+
+```elixir
+defmodule Block do
+  defstruct [:data, :timestamp, :prev_hash, :hash]
+
+  def new(data, prev_hash) do
+    %Block{
+      data: data,
+      timestamp: NaiveDateTime.utc_now(),
+      prev_hash: prev_hash,
+      hash: nil
+    }
+  end
+
+  def zero do
+    %Block{
+      data: "ZERO_DATA",
+      timestamp: NaiveDateTime.utc_now(),
+      prev_hash: "ZERO_HASH",
+      hash: nil
+    }
+  end
+end
+```
+
+Each block has:
+
+- **Data**: Whatever you want to store
+- **Timestamp**: When it was created
+- **Previous Hash**: Links to the previous block
+- **Hash**: The block's own cryptographic fingerprint
+
+### Hashing
+
+The `Crypto` module handles all the hashing with SHA256:
+
+```elixir
+defmodule Crypto do
+  @hash_fields [:data, :timestamp, :prev_hash]
+
+  def hash(%Block{} = block) do
+    block
+    |> Map.take(@hash_fields)
+    |> Poison.encode!
+    |> sha256
+  end
+
+  def put_hash(%{} = block) do
+    %{block | hash: hash(block)}
+  end
+
+  defp sha256(binary) do
+    :crypto.hash(:sha256, binary) |> Base.encode16
+  end
+end
+```
+
+Key points:
+
+- Only data, timestamp, and prev_hash go into the hash calculation
+- Uses standard SHA256 with uppercase hex output
+
+### Blockchain Operations
+
+The `Blockchain` module manages the actual chain:
+
+```elixir
+defmodule Blockchain do
+  def new do
+    genesis = Block.zero() |> Crypto.put_hash()
+    [genesis]
+  end
+
+  def insert(blockchain, data) do
+    prev_block = List.first(blockchain)
+
+    new_block =
+      Block.new(data, prev_block.hash)
+      |> Crypto.put_hash()
+
+    [new_block | blockchain]
+  end
+
+  def valid?(blockchain) do
+    blockchain
+    |> Enum.reverse()
+    |> validate_chain()
+  end
+end
+```
+
+The blockchain is just a list with the newest block at the front - works well with Elixir's list structure.
+
+## Debugging Fun
+
+When I first got everything together, all the tests were failing. Turned out there were several issues that needed fixing:
+
+### Timestamp Issues
+
+The code was using Unix timestamps but tests expected `NaiveDateTime` objects:
+
+```elixir
+# Wrong
+timestamp: DateTime.utc_now() |> DateTime.to_unix()
+
+# Right
+timestamp: NaiveDateTime.utc_now()
+```
+
+### Genesis Block Problems
+
+Tests expected genesis blocks to have `prev_hash: "ZERO_HASH"`, not `nil`.
+
+### Hash Format Problems
+
+Had mixed uppercase/lowercase hashes, needed to standardize on uppercase.
+
+### Function Pattern Conflicts
+
+Two `hash/1` functions with overlapping patterns:
+
+```elixir
+# This never gets called!
+def hash(%{} = block) do ... end
+
+def hash(data) do ... end  # Matches everything first
+```
+
+Fixed by making the block pattern more specific: `hash(%Block{} = block)`.
+
+### Validation Logic Bug
+
+The validation logic had the parameters backwards:
+
+```elixir
+# Wrong
+defp validate_chain([block | [prev_block | _] = rest]) do
+  Block.valid?(block, prev_block) && validate_chain(rest)
+end
+
+# Right
+defp validate_chain([prev_block | [current_block | _] = rest]) do
+  Block.valid?(prev_block) && Block.valid?(current_block, prev_block) && validate_chain(rest)
+end
+```
+
+## Why Elixir Works Well
+
+A few things that made this easier in Elixir:
+
+### Immutability
+
+Since everything is immutable by default, blockchain operations naturally return new chains rather than modifying existing ones.
+
+### Pattern Matching
+
+The recursive validation logic is clean:
+
+```elixir
+defp validate_chain([]), do: false
+defp validate_chain([genesis_block]), do: Block.valid?(genesis_block)
+defp validate_chain([prev_block | [current_block | _] = rest]) do
+  Block.valid?(prev_block) &&
+  Block.valid?(current_block, prev_block) &&
+  validate_chain(rest)
+end
+```
+
+### Testing
+
+Pure functions make testing straightforward.
+
+## What's Missing
+
+This is obviously a toy implementation. Real blockchains need:
+
+- Consensus mechanisms (Proof of Work, etc.)
+- Network communication
+- Persistent storage
+- Transaction handling
+- Digital signatures
+- Performance optimizations
+
+## Testing
+
+The project has 43 tests covering the basics:
+
+- Block creation and validation
+- Hash consistency
+- Chain operations
+- Edge cases and corruption detection
+
+Here's what it looks like running:
+
+```
+=== Simple Blockchain Test ===
+
+1. Creating a new blockchain...
+2. Inserting 'MESSAGE 1'...
+3. Inserting 'MESSAGE 2' and 'MESSAGE 3'...
+4. Validating the blockchain...
+Blockchain is valid: true
+
+5. Block details:
+Block 0: ZERO_DATA (Hash: 9518E2175D869460...)
+Block 1: MESSAGE 1 (Hash: 221FCFA6F4C72D12...)
+Block 2: MESSAGE 2 (Hash: 48AAA0712AD7DD5A...)
+Block 3: MESSAGE 3 (Hash: 7454D00D96F4FB1D...)
+```
+
+## What I Learned
+
+### Keep It Simple
+
+Starting with the basics and building up worked well. Each piece was easy to understand and test.
+
+### Tests Help
+
+The comprehensive test suite caught bugs immediately and showed exactly what the expected behavior should be.
+
+### Debug Systematically
+
+When everything broke, writing debug scripts to isolate issues was much faster than guessing.
+
+### Functional Programming Fits
+
+Elixir's approach of immutable data and pure functions feels natural for blockchain concepts.
+
+## Try It Yourself
+
+If you want to play around with it:
+
+```bash
+# Clone and run
+git clone https://github.com/BenGlasser/exblock.git
+cd exblock
+mix deps.get
+mix test
+mix run test_blockchain.exs
+
+# Interactive mode
+iex -S mix
+```
+
+## Conclusion
+
+ExBlock is a basic blockchain that demonstrates the core concepts in a clean way. It's about 200 lines of Elixir that cover:
+
+- Cryptographic hashing
+- Block linkage
+- Chain validation
+- Simple data storage
+
+The functional programming approach worked well for this kind of system, and Elixir's pattern matching made the validation logic pretty readable.
+
+It's definitely just an academic exercise, but it helped me understand how the fundamental pieces fit together. If you're curious about blockchain internals or want to see how functional programming applies to this kind of problem, the code is straightforward to follow.
+
+---
