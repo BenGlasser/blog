@@ -13,6 +13,12 @@ const projectsData: Project[] = [
     imgSrc: '/static/images/blog/starfield.gif',
     href: '/blog/20250516-StarfieldVisualizer',
   },
+  {
+    title: 'Blockchain in Elixir',
+    description: `A straightforward implementation of basic blockchain concepts for learning purposes.`,
+    imgSrc: '/static/images/blog/20250606-elixir-blockchain/image.png',
+    href: '/blog/20250606-elixir-blockchain',
+  },
 ]
 
 export default projectsData
