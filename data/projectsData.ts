@@ -16,7 +16,7 @@ const projectsData: Project[] = [
   {
     title: 'Blockchain in Elixir',
     description: `A straightforward implementation of basic blockchain concepts for learning purposes.`,
-    imgSrc: '/static/images/blog/20250606-creating-exblock/HighTeckComputer.gif',
+    imgSrc: '/static/images/blog/20250606-creating-exblock/HighTechComputer.gif',
     href: '/blog/20250606-creating-exblock',
   },
 ]
