@@ -1,0 +1,221 @@
+---
+title: Building Timewith.me
+date: '2025-05-14'
+tags: ['github', 'projects']
+draft: false
+summary: A debriefing of my exprience setting up code coverage reports for a NodeJS project using vitest in github actions
+---
+
+# [TimeWith.me](https://github.com/benglasser/time-with-me)
+
+**Find Free Time With Friends—Effortlessly**
+
+## Description
+
+This project is simple web app that looks at your Google Calendar and tells you exactly when you're available. You just pick a date range (like "next week" or "this month"), set your preferred hours (maybe 9 AM to 6 PM), and it scans all your calendar events to find the gaps where you're actually free.
+
+Then you can copy-paste that list of free times and share it with whoever you're trying to meet up with.
+
+One of the motivations for creating this was to explore serverless archetecture, specifically, realtime databases. I want to know how much I can getaway with when I don't have a server to depend one. Conversly, how much do I gain by not having to deal with servers.
+
+## Features
+
+### **Smart Calendar Integration**
+
+- **Google Calendar Sync**: Connects to your Google Calendar with secure OAuth2 authentication
+- **Multi-Calendar Support**: Analyzes events across all your accessible calendars
+- **Real-time Processing**: Instantly processes calendar data without storing it on our servers
+
+### **Intelligent Free Time Detection**
+
+- **Custom Date Ranges**: Select any date range to find availability
+- **Daily Time Windows**: Set preferred hours (e.g., 9 AM - 5 PM) for each day
+- **Conflict Resolution**: Automatically handles overlapping events across multiple calendars
+- **Gap Analysis**: Identifies free time blocks between scheduled events
+
+### **Privacy-First Design**
+
+- **Client-Side Processing**: All calendar analysis happens in your browser
+- **No Data Storage**: Your calendar information is never stored on our servers
+- **Secure Authentication**: OAuth2 tokens are handled securely with automatic refresh
+- **Transparent Permissions**: Only requests calendar read access
+
+### **Easy Sharing**
+
+- **Copy to Clipboard**: One-click export of your availability
+- **Timezone Display**: Shows results in your local timezone
+- **Formatted Output**: Clean, readable format perfect for sharing
+
+### **Modern User Experience**
+
+- **Responsive Design**: Works seamlessly on desktop and mobile
+- **Neon Theme**: Eye-catching cyberpunk-inspired design
+- **Smooth Animations**: Powered by Framer Motion for fluid interactions
+- **Intuitive Interface**: Simple, clean forms with clear feedback
+
+## Dependencies
+
+### Prerequisites
+
+- **Node.js** (v18 or higher)
+- **npm** or **yarn**
+- **Google Cloud Console** account (for OAuth2 setup)
+- **Firebase** account (for cloud functions)
+
+### Required Dependencies
+
+#### Core Dependencies
+
+```json
+{
+  "react": "^19.1.0",
+  "react-dom": "^19.1.0",
+  "react-router-dom": "^6.22.3",
+  "vite": "^7.0.4"
+}
+```
+
+#### Authentication & API
+
+```json
+{
+  "@react-oauth/google": "^0.12.2",
+  "firebase": "^11.10.0",
+  "reactfire": "^4.2.3",
+  "js-cookie": "^3.0.5"
+}
+```
+
+#### Styling & UI
+
+```json
+{
+  "tailwindcss": "^3.4.1",
+  "framer-motion": "^11.0.17",
+  "react-icons": "^5.5.0",
+  "autoprefixer": "^10.4.16",
+  "postcss": "^8.4.38"
+}
+```
+
+#### Development Tools
+
+```json
+{
+  "eslint": "^9.30.1",
+  "firebase-admin": "^13.4.0",
+  "firebase-functions": "^6.3.2",
+  "@types/react": "^19.1.8",
+  "@types/react-dom": "^19.1.6"
+}
+```
+
+## Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/benglasser/time-with-me.git
+cd time-with-me
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Environment Setup
+
+Create a `.env` file in the root directory:
+
+```env
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+VITE_FIREBASE_CONFIG=your_firebase_api_config
+```
+
+### 4. Firebase Setup
+
+1. Create a Firebase project at https://console.firebase.google.com
+2. Enable Firestore Database
+3. Set up Authentication with Google provider
+4. Deploy the cloud functions:
+   ```bash
+   cd firebase/functions
+   npm install
+   firebase deploy --only functions
+   ```
+
+### 5. Google Cloud Console Setup
+
+1. Go to https://console.cloud.google.com
+2. Create a new project or select existing
+3. Enable Google Calendar API
+4. Create OAuth2 credentials
+5. Add your domain to authorized origins
+
+### 6. Run the Development Server
+
+```bash
+yarn dev
+```
+
+The app will be available at `http://localhost:5173`
+
+### 7. Build for Production
+
+```bash
+yarn build
+yarn preview
+```
+
+## Available Scripts
+
+- `yarn dev` - Start development server
+- `yarn build` - Build for production
+- `yarn lint` - Run ESLint
+- `yarn preview` - Preview production build
+
+## Future Features
+
+### **Multi-User Coordination**
+
+- **Group Availability**: Compare schedules across multiple users
+- **Meeting Suggestions**: AI-powered optimal meeting time recommendations
+- **Invitation System**: Send calendar invites directly through the app
+
+### **Integrations**
+
+- **Outlook Calendar**: Support for Microsoft Outlook/Exchange calendars
+- **Apple Calendar**: iCloud calendar integration
+- **Slack Integration**: Share availability directly in Slack channels
+- **Teams Integration**: Microsoft Teams calendar sync
+
+### **Analytics**
+
+- **Schedule Patterns**: Analyze your free time patterns over time
+- **Productivity Insights**: Track how calendar density affects availability
+- **Team Analytics**: Organizational schedule optimization insights
+
+### **Smart Features**
+
+- **Recurring Availability**: Set up regular free time blocks
+- **Location-Based Filtering**: Factor in location and travel time
+- **Meeting Duration Optimization**: Suggest optimal meeting lengths
+
+### **Collaboration Tools**
+
+- **Shared Calendars**: Create shared availability calendars
+- **Booking Links**: Generate shareable booking links
+- **Meeting Polls**: Create polls for optimal meeting times
+- **Calendar Overlays**: Visual calendar overlay comparisons
+
+### **Customization**
+
+- **Theme Options**: Multiple color schemes and themes
+- **Custom Time Zones**: Multi-timezone support for global teams
+- **Flexible Formats**: Customizable output formats
+
+---
+
+**Built with ❤️ for better scheduling**

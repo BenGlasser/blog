@@ -19,6 +19,12 @@ const projectsData: Project[] = [
     imgSrc: '/static/images/blog/20250606-creating-exblock/HighTechComputer.gif',
     href: '/blog/20250606-creating-exblock',
   },
+  {
+    title: 'Time with me',
+    description: `A simple web app that searches your calendars for blocks of contiguous free time.  One of the motivations for creating this was to explore serverless archetecture, specifically, realtime databases. I want to know how much I can getaway with when I don't have a server to depend one. Conversly, how much do I gain by not having to deal with servers.`,
+    imgSrc: '/static/images/blog/20250715-time-with-me/clocksmash.png',
+    href: '/blog/20250715-time-with-me',
+  },
 ]
 
 export default projectsData

@@ -3,7 +3,7 @@ title: Setting up code coverage reporting with GitHub Actions
 date: '2025-05-14'
 tags: ['github', 'configuration', 'personal notes']
 draft: false
-summary: A debriefing of my exprience setting up code coverage reports for a NodeJS project using vitest in github actions
+summary: One of the motivations for creating this was to explore serverless archetecture, specifically, realtime databases. I want to know how much I can getaway with when I don't have a server to depend one. Conversly, how much do I gain by not having to deal with servers.
 ---
 
 # 🚀 Streamlining Vitest Coverage Reports in GitHub Actions
@@ -70,7 +70,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Required for full git history and diff tracking
+          fetch-depth: 0 # Required for full git history and diff tracking
 
       - uses: actions/setup-node@v4
         with:
@@ -85,7 +85,7 @@ jobs:
         run: cd server && npx vitest run --coverage.enabled true
 
       - name: Report server coverage
-        if: always()  # Ensure this step runs even if tests fail
+        if: always() # Ensure this step runs even if tests fail
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           name: Server
