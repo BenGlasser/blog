@@ -15,6 +15,7 @@ const siteMetadata = {
   email: 'Ben@BenGlasser.com',
   github: 'https://github.com/benglasser',
   x: 'https://twitter.com/benglasser',
+  resume: 'https://benglasser.com/blog/resume',
   // twitter: 'https://twitter.com/Twitter',
   facebook: 'https://facebook.com',
   youtube: 'https://youtube.com',

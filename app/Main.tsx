@@ -17,9 +17,10 @@ export default function Home({ posts }) {
   const mainContent = coreContent(author)
   return (
     <>
-      <AuthorLayout content={mainContent} showSocials={false}>
+      <AuthorLayout content={mainContent} showSocials={true}>
         <MDXLayoutRenderer code={author.body.code} />
       </AuthorLayout>
+      <hr className="mt-20 divide-y divide-gray-200 dark:divide-gray-700" />
       <ul className="divide-y divide-gray-200 dark:divide-gray-700">
         {!posts.length && 'No posts found.'}
         {posts.slice(0, MAX_DISPLAY).map((post) => {
