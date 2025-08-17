@@ -406,6 +406,59 @@
           transform: scale(1);
         }
       }
+
+      /* Image Carousel */
+      .carousel-container {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        margin: 3rem auto;
+        overflow: hidden;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(157, 78, 221, 0.3);
+      }
+
+      .carousel-track {
+        display: flex;
+        animation: scroll 12s linear infinite;
+      }
+
+      .carousel-slide {
+        min-width: 100%;
+        height: 400px;
+      }
+
+      .carousel-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 15px;
+      }
+
+      @keyframes scroll {
+        0% {
+          transform: translateX(0);
+        }
+        33.33% {
+          transform: translateX(-100%);
+        }
+        66.66% {
+          transform: translateX(-200%);
+        }
+        100% {
+          transform: translateX(-300%);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .carousel-container {
+          max-width: 90%;
+        }
+        
+        .carousel-slide {
+          height: 300px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -434,6 +487,25 @@
         <div class="hero-buttons">
           <a href="#contact" class="cta-button pulse">Get Your 10% Discount</a>
           <a href="#services" class="secondary-button">View Summer Specials</a>
+        </div>
+        
+        <!-- Image Carousel -->
+        <div class="carousel-container">
+          <div class="carousel-track">
+            <div class="carousel-slide">
+              <img src="https://static.wixstatic.com/media/dcd394_98d7efe04d434311aa7edf37546816cb~mv2.jpg/v1/fill/w_566,h_944,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250606_084857.jpg" alt="Professional Auto Detailing - BMW X5" />
+            </div>
+            <div class="carousel-slide">
+              <img src="https://static.wixstatic.com/media/dcd394_002d38c266694474acf1dc69f98cc50b~mv2.jpg/v1/fill/w_566,h_944,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250530_183404.jpg" alt="Mobile Detailing Service - Corvette" />
+            </div>
+            <div class="carousel-slide">
+              <img src="https://static.wixstatic.com/media/dcd394_e51dd94476024cf290a59d0ec7d7fc1b~mv2.jpg/v1/crop/x_52,y_0,w_1585,h_2209/fill/w_966,h_1338,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250606_084629_edited.jpg" alt="Premium Car Care Results" />
+            </div>
+            <!-- Duplicate slides for seamless loop -->
+            <div class="carousel-slide">
+              <img src="https://static.wixstatic.com/media/dcd394_98d7efe04d434311aa7edf37546816cb~mv2.jpg/v1/fill/w_566,h_944,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250606_084857.jpg" alt="Professional Auto Detailing - BMW X5" />
+            </div>
+          </div>
         </div>
       </div>
     </section>
