@@ -534,23 +534,27 @@
         <!-- Image Carousel -->
         <div class="carousel-container" id="carousel">
           <div class="carousel-track" id="carouselTrack">
-            <!-- Duplicate of last image for seamless loop -->
-            <div class="carousel-slide prev" data-index="2">
+            <!-- Infinite loop: we need enough slides to never see empty space -->
+            <div class="carousel-slide" data-original-index="2">
               <img src="https://static.wixstatic.com/media/dcd394_e51dd94476024cf290a59d0ec7d7fc1b~mv2.jpg/v1/crop/x_52,y_0,w_1585,h_2209/fill/w_966,h_1338,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250606_084629_edited.jpg" alt="Premium Car Care Results" />
             </div>
-            <!-- Original images -->
-            <div class="carousel-slide active" data-index="0">
+            <div class="carousel-slide active" data-original-index="0">
               <img src="https://static.wixstatic.com/media/dcd394_98d7efe04d434311aa7edf37546816cb~mv2.jpg/v1/fill/w_566,h_944,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250606_084857.jpg" alt="Professional Auto Detailing - BMW X5" />
             </div>
-            <div class="carousel-slide next" data-index="1">
+            <div class="carousel-slide" data-original-index="1">
               <img src="https://static.wixstatic.com/media/dcd394_002d38c266694474acf1dc69f98cc50b~mv2.jpg/v1/fill/w_566,h_944,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250530_183404.jpg" alt="Mobile Detailing Service - Corvette" />
             </div>
-            <div class="carousel-slide" data-index="2">
+            <div class="carousel-slide" data-original-index="2">
               <img src="https://static.wixstatic.com/media/dcd394_e51dd94476024cf290a59d0ec7d7fc1b~mv2.jpg/v1/crop/x_52,y_0,w_1585,h_2209/fill/w_966,h_1338,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250606_084629_edited.jpg" alt="Premium Car Care Results" />
             </div>
-            <!-- Duplicate of first image for seamless loop -->
-            <div class="carousel-slide" data-index="0">
+            <div class="carousel-slide" data-original-index="0">
               <img src="https://static.wixstatic.com/media/dcd394_98d7efe04d434311aa7edf37546816cb~mv2.jpg/v1/fill/w_566,h_944,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250606_084857.jpg" alt="Professional Auto Detailing - BMW X5" />
+            </div>
+            <div class="carousel-slide" data-original-index="1">
+              <img src="https://static.wixstatic.com/media/dcd394_002d38c266694474acf1dc69f98cc50b~mv2.jpg/v1/fill/w_566,h_944,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250530_183404.jpg" alt="Mobile Detailing Service - Corvette" />
+            </div>
+            <div class="carousel-slide" data-original-index="2">
+              <img src="https://static.wixstatic.com/media/dcd394_e51dd94476024cf290a59d0ec7d7fc1b~mv2.jpg/v1/crop/x_52,y_0,w_1585,h_2209/fill/w_966,h_1338,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250606_084629_edited.jpg" alt="Premium Car Care Results" />
             </div>
           </div>
           <div class="carousel-nav">
@@ -872,88 +876,92 @@
           observer.observe(card)
         })
 
-      // Carousel functionality
-      let currentSlide = 0
+      // Infinite Carousel functionality
+      let currentLogicalSlide = 0 // Which image we're conceptually showing (0, 1, 2)
+      let currentPhysicalSlide = 1 // Which DOM slide is currently active (starts at index 1)
       const totalOriginalSlides = 3 // BMW, Corvette, Car Care Results
       const allSlides = document.querySelectorAll('.carousel-slide')
       const dots = document.querySelectorAll('.carousel-dot')
-      
-      const imageUrls = [
-        "https://static.wixstatic.com/media/dcd394_98d7efe04d434311aa7edf37546816cb~mv2.jpg/v1/fill/w_566,h_944,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250606_084857.jpg",
-        "https://static.wixstatic.com/media/dcd394_002d38c266694474acf1dc69f98cc50b~mv2.jpg/v1/fill/w_566,h_944,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250530_183404.jpg",
-        "https://static.wixstatic.com/media/dcd394_e51dd94476024cf290a59d0ec7d7fc1b~mv2.jpg/v1/crop/x_52,y_0,w_1585,h_2209/fill/w_966,h_1338,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/20250606_084629_edited.jpg"
-      ]
+      const track = document.getElementById('carouselTrack')
+      const slideWidth = 332 // 300px width + 32px gap
 
       function updateCarousel() {
-        // Remove all classes first
-        allSlides.forEach(slide => {
-          slide.classList.remove('active', 'prev', 'next')
-        })
-
-        // Calculate indices for infinite loop
-        const prevIndex = (currentSlide - 1 + totalOriginalSlides) % totalOriginalSlides
-        const nextIndex = (currentSlide + 1) % totalOriginalSlides
-
-        // Update all slides based on their position
-        allSlides.forEach((slide, index) => {
-          const slideDataIndex = parseInt(slide.getAttribute('data-index'))
-          
-          if (slideDataIndex === currentSlide) {
-            slide.classList.add('active')
-          } else if (slideDataIndex === prevIndex) {
-            slide.classList.add('prev')
-          } else if (slideDataIndex === nextIndex) {
-            slide.classList.add('next')
-          }
-        })
-
-        // Update dots
+        // Remove all active classes
+        allSlides.forEach(slide => slide.classList.remove('active'))
+        
+        // Set the current physical slide as active
+        allSlides[currentPhysicalSlide].classList.add('active')
+        
+        // Update dots based on logical slide
         dots.forEach((dot, index) => {
           dot.classList.remove('active')
-          if (index === currentSlide) {
+          if (index === currentLogicalSlide) {
             dot.classList.add('active')
           }
         })
 
-        // Center the carousel - always show 3 images (prev, active, next)
-        const track = document.getElementById('carouselTrack')
-        const slideWidth = 300 + 32 // width + gap
-        
-        // Find the active slide and center it
-        let activeSlideIndex = 1 // Start with the middle position (index 1 is the first "real" active slide)
-        
-        // Adjust based on current slide to always show prev-active-next
-        if (currentSlide === 0) {
-          activeSlideIndex = 1 // BMW is active, show last-BMW-Corvette
-        } else if (currentSlide === 1) {
-          activeSlideIndex = 2 // Corvette is active, show BMW-Corvette-CarCare  
-        } else if (currentSlide === 2) {
-          activeSlideIndex = 3 // CarCare is active, show Corvette-CarCare-BMW
-        }
-        
+        // Position the track to show 3 slides centered
+        // We want the middle slide (currentPhysicalSlide) to be in the center
         const containerWidth = document.getElementById('carousel').offsetWidth
-        const offset = (containerWidth / 2) - (slideWidth / 2) - (activeSlideIndex * slideWidth)
-        track.style.transform = `translateX(${offset}px)`
+        const centerOffset = (containerWidth / 2) - (slideWidth / 2)
+        const slideOffset = currentPhysicalSlide * slideWidth
+        const finalOffset = centerOffset - slideOffset
+        
+        track.style.transform = `translateX(${finalOffset}px)`
       }
 
-      function nextSlide() {
-        currentSlide = (currentSlide + 1) % totalOriginalSlides
-        updateCarousel()
+      function moveToNextSlide() {
+        // Move to next logical slide
+        currentLogicalSlide = (currentLogicalSlide + 1) % totalOriginalSlides
+        
+        // Move to next physical slide
+        currentPhysicalSlide++
+        
+        // If we've moved past the visible slides, reset position seamlessly
+        if (currentPhysicalSlide >= allSlides.length - 2) {
+          // Temporarily disable transitions for seamless reset
+          track.style.transition = 'none'
+          currentPhysicalSlide = 1 // Reset to the beginning of our loop
+          updateCarousel()
+          
+          // Re-enable transitions after a brief moment
+          setTimeout(() => {
+            track.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          }, 50)
+        } else {
+          updateCarousel()
+        }
       }
 
-      function goToSlide(index) {
-        currentSlide = index
+      function goToSlide(targetLogicalSlide) {
+        // Find the closest physical slide that matches the target logical slide
+        let bestPhysicalSlide = 1
+        let minDistance = Infinity
+        
+        allSlides.forEach((slide, index) => {
+          const originalIndex = parseInt(slide.getAttribute('data-original-index'))
+          if (originalIndex === targetLogicalSlide) {
+            const distance = Math.abs(index - currentPhysicalSlide)
+            if (distance < minDistance) {
+              minDistance = distance
+              bestPhysicalSlide = index
+            }
+          }
+        })
+        
+        currentLogicalSlide = targetLogicalSlide
+        currentPhysicalSlide = bestPhysicalSlide
         updateCarousel()
       }
 
       // Auto-advance every 5 seconds
-      setInterval(nextSlide, 5000)
+      setInterval(moveToNextSlide, 5000)
 
       // Click handlers for slides
       allSlides.forEach((slide, index) => {
         slide.addEventListener('click', () => {
-          const slideDataIndex = parseInt(slide.getAttribute('data-index'))
-          goToSlide(slideDataIndex)
+          const originalIndex = parseInt(slide.getAttribute('data-original-index'))
+          goToSlide(originalIndex)
         })
       })
 
@@ -964,8 +972,15 @@
         })
       })
 
+      // Initialize carousel
+      function initCarousel() {
+        // Set initial transition
+        track.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        updateCarousel()
+      }
+
       // Initialize carousel on load
-      window.addEventListener('load', updateCarousel)
+      window.addEventListener('load', initCarousel)
       window.addEventListener('resize', updateCarousel)
     </script>
   </body>
