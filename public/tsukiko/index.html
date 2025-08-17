@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tsukiko Mobile Auto Detailing | Premium Car Care</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Arial', sans-serif;
+        background: #0a0a0a;
+        color: #ffffff;
+        overflow-x: hidden;
+      }
+
+      /* Header */
+      .header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        padding: 1rem 0;
+        border-bottom: 1px solid #333;
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #ff6b35;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 2rem;
+      }
+
+      .nav-links a {
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        position: relative;
+      }
+
+      .nav-links a:hover {
+        color: #ff6b35;
+      }
+
+      .nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #ff6b35;
+        transition: width 0.3s ease;
+      }
+
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+
+      .cta-button {
+        background: linear-gradient(45deg, #ff6b35, #f7931e);
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+      }
+
+      /* Hero Section */
+      .hero {
+        height: 100vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+          url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect fill="%23111" width="1200" height="800"/><polygon fill="%23222" points="0,400 300,200 600,300 900,100 1200,250 1200,800 0,800"/><polygon fill="%23333" points="300,200 600,300 900,100 1200,250 1200,400 900,350 600,450 300,350 0,400"/></svg>');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+      }
+
+      .hero-content {
+        max-width: 800px;
+        padding: 0 2rem;
+        animation: fadeInUp 1s ease;
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        background: linear-gradient(45deg, #ff6b35, #f7931e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        color: #cccccc;
+        line-height: 1.6;
+      }
+
+      .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .secondary-button {
+        background: transparent;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border: 2px solid #ff6b35;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .secondary-button:hover {
+        background: #ff6b35;
+        color: white;
+      }
+
+      /* Features Section */
+      .features {
+        padding: 5rem 0;
+        background: #111111;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+        color: #ffffff;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+      }
+
+      .feature-card {
+        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        padding: 2rem;
+        border-radius: 10px;
+        text-align: center;
+        transition: transform 0.3s ease;
+        border: 1px solid #333;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-10px);
+        border-color: #ff6b35;
+      }
+
+      .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(45deg, #ff6b35, #f7931e);
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+
+      .feature-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        color: #ff6b35;
+      }
+
+      .feature-card p {
+        color: #cccccc;
+        line-height: 1.6;
+      }
+
+      /* Services Section */
+      .services {
+        padding: 5rem 0;
+        background: #0a0a0a;
+      }
+
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+      }
+
+      .service-card {
+        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        border: 1px solid #333;
+      }
+
+      .service-card:hover {
+        transform: scale(1.05);
+        border-color: #ff6b35;
+      }
+
+      .service-image {
+        height: 200px;
+        background: linear-gradient(45deg, #ff6b35, #f7931e);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+      }
+
+      .service-content {
+        padding: 1.5rem;
+      }
+
+      .service-card h3 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+        color: #ff6b35;
+      }
+
+      .service-card p {
+        color: #cccccc;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+      }
+
+      .service-price {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #f7931e;
+        margin-bottom: 1rem;
+      }
+
+      /* Testimonials */
+      .testimonials {
+        padding: 5rem 0;
+        background: #111111;
+      }
+
+      .testimonial-card {
+        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        padding: 2rem;
+        border-radius: 15px;
+        border-left: 4px solid #ff6b35;
+        margin-bottom: 2rem;
+      }
+
+      .testimonial-text {
+        font-style: italic;
+        color: #cccccc;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+      }
+
+      .testimonial-author {
+        color: #ff6b35;
+        font-weight: bold;
+      }
+
+      .stars {
+        color: #f7931e;
+        margin-bottom: 1rem;
+      }
+
+      /* Contact Section */
+      .contact {
+        padding: 5rem 0;
+        background: #0a0a0a;
+        text-align: center;
+      }
+
+      .contact-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+
+      .contact-item {
+        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        padding: 2rem;
+        border-radius: 10px;
+        border: 1px solid #333;
+      }
+
+      .contact-item h3 {
+        color: #ff6b35;
+        margin-bottom: 1rem;
+      }
+
+      .contact-item p {
+        color: #cccccc;
+      }
+
+      /* Footer */
+      .footer {
+        background: #000000;
+        padding: 2rem 0;
+        text-align: center;
+        border-top: 1px solid #333;
+      }
+
+      .footer p {
+        color: #888888;
+      }
+
+      /* Animations */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Mobile Responsiveness */
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+
+        .hero-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .features-grid,
+        .services-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Special Effects */
+      .glow {
+        box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+      }
+
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">Tsukiko</div>
+        <ul class="nav-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <a href="#contact" class="cta-button">Book Now</a>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <h1>Premium Mobile Auto Detailing</h1>
+        <p>
+          Get 10% Off Your First Full Detail Package! Professional-grade car care that comes to you
+          in Bountiful, Kaysville, Farmington & surrounding areas.
+        </p>
+        <div class="hero-buttons">
+          <a href="#contact" class="cta-button pulse">Get Your 10% Discount</a>
+          <a href="#services" class="secondary-button">View Summer Specials</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="about">
+      <div class="container">
+        <h2 class="section-title">Why Choose Tsukiko?</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🚗</div>
+            <h3>Mobile Convenience</h3>
+            <p>
+              We come to you! No need to drive anywhere - we bring professional detailing services
+              directly to your location.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⭐</div>
+            <h3>Premium Quality</h3>
+            <p>
+              Using only the finest products and techniques to ensure your vehicle looks better than
+              the day you bought it.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Paint Protection</h3>
+            <p>
+              Advanced ceramic coatings and protective treatments that keep your car looking
+              pristine for years to come.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Quick Turnaround</h3>
+            <p>
+              Efficient service without compromising quality. Most services completed in 2-4 hours
+              at your location.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">💯</div>
+            <h3>Satisfaction Guaranteed</h3>
+            <p>
+              100% satisfaction guarantee on all services. If you're not happy, we'll make it right.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🏆</div>
+            <h3>Expert Technicians</h3>
+            <p>
+              Trained professionals with years of experience in automotive detailing and paint
+              correction.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+      <div class="container">
+        <h2 class="section-title">Our Services</h2>
+        <div class="services-grid">
+          <div class="service-card">
+            <div class="service-image">🧽</div>
+            <div class="service-content">
+              <h3>$199 Summer Sale Full Detail Special</h3>
+              <p>
+                Get our most popular interior + exterior mobile car detailing service for just $199.
+                Includes stain removal, foam cannon wash, wax protection, and tire shine.
+              </p>
+              <div class="service-price">$199 (Normally $250)</div>
+              <div style="color: #f7931e; font-size: 0.9rem; margin-bottom: 1rem">
+                📍 Servicing Bountiful, Kaysville, Farmington & more
+              </div>
+              <a href="#contact" class="cta-button">Book Now</a>
+            </div>
+          </div>
+          <div class="service-card">
+            <div class="service-image">✨</div>
+            <div class="service-content">
+              <h3>Ceramic Coating Special</h3>
+              <p>
+                Protect your vehicle's paint with a long-lasting ceramic coating. Includes
+                decontamination, clay bar, polish, and full ceramic application. Add deep gloss,
+                easy maintenance, and 1–3 years of protection.
+              </p>
+              <div class="service-price">Starting at $499</div>
+              <div style="color: #f7931e; font-size: 0.9rem; margin-bottom: 1rem">
+                ✅ Great for luxury vehicles and resale prep
+              </div>
+              <a href="#contact" class="cta-button">Book Now</a>
+            </div>
+          </div>
+          <div class="service-card">
+            <div class="service-image">🚿</div>
+            <div class="service-content">
+              <h3>Exterior Wash & Wax</h3>
+              <p>
+                Professional exterior cleaning with foam cannon, hand wash, clay bar treatment, and
+                premium wax application for lasting shine.
+              </p>
+              <div class="service-price">Starting at $89</div>
+              <a href="#contact" class="cta-button">Book Now</a>
+            </div>
+          </div>
+          <div class="service-card">
+            <div class="service-image">🧹</div>
+            <div class="service-content">
+              <h3>Interior Deep Clean</h3>
+              <p>
+                Comprehensive interior detailing including vacuum, steam cleaning, leather
+                conditioning, and stain removal for a fresh cabin.
+              </p>
+              <div class="service-price">Starting at $79</div>
+              <a href="#contact" class="cta-button">Book Now</a>
+            </div>
+          </div>
+          <div class="service-card">
+            <div class="service-image">🔧</div>
+            <div class="service-content">
+              <h3>Paint Correction</h3>
+              <p>
+                Professional paint correction to remove swirl marks, scratches, and imperfections,
+                restoring your paint to like-new condition.
+              </p>
+              <div class="service-price">Starting at $299</div>
+              <a href="#contact" class="cta-button">Book Now</a>
+            </div>
+          </div>
+          <div class="service-card">
+            <div class="service-image">🏁</div>
+            <div class="service-content">
+              <h3>Performance Package</h3>
+              <p>
+                Ultimate detail for performance and luxury vehicles including multi-stage
+                correction, ceramic coating, and show-quality finish.
+              </p>
+              <div class="service-price">Starting at $799</div>
+              <a href="#contact" class="cta-button">Book Now</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+      <div class="container">
+        <h2 class="section-title">What Our Customers Say</h2>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">
+            "Absolutely incredible work! My BMW looks better than when I first bought it. The
+            ceramic coating is amazing and the convenience of having them come to my house is
+            unbeatable."
+          </p>
+          <div class="testimonial-author">- Mike R., Bountiful</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">
+            "Professional, punctual, and the results speak for themselves. The team at Tsukiko
+            transformed my car from neglected to showroom quality. Highly recommended!"
+          </p>
+          <div class="testimonial-author">- Sarah K., Kaysville</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">
+            "I've tried other detailing services, but Tsukiko is in a league of their own. The
+            attention to detail and quality of work is outstanding. My car has never looked this
+            good."
+          </p>
+          <div class="testimonial-author">- David L., Farmington</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+      <div class="container">
+        <h2 class="section-title">Get 10% Off Your First Detail</h2>
+        <p style="color: #cccccc; font-size: 1.1rem; margin-bottom: 2rem">
+          Enter your phone number to unlock your exclusive 10% discount, plus get priority access to
+          mobile detailing deals, seasonal promos, and quick quotes.
+        </p>
+
+        <!-- Phone Number Form -->
+        <div
+          style="
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 0 auto 3rem;
+            border: 1px solid #ff6b35;
+          "
+        >
+          <h3 style="color: #ff6b35; margin-bottom: 1rem; text-align: center">
+            Unlock Special Pricing
+          </h3>
+          <form style="display: flex; flex-direction: column; gap: 1rem">
+            <input
+              type="tel"
+              placeholder="Enter your phone number"
+              style="
+                padding: 1rem;
+                border: 1px solid #333;
+                border-radius: 5px;
+                background: #0a0a0a;
+                color: white;
+                font-size: 1rem;
+              "
+            />
+            <button type="submit" class="cta-button" style="width: 100%">
+              Get My 10% Discount
+            </button>
+          </form>
+          <p style="color: #888; font-size: 0.9rem; text-align: center; margin-top: 1rem">
+            📲 Deals only visible after phone number submission
+          </p>
+        </div>
+
+        <div class="hero-buttons">
+          <a href="tel:+1234567890" class="cta-button glow">Call for Instant Quote</a>
+          <a href="mailto:info@tsukikomobile.com" class="secondary-button">Email Us</a>
+        </div>
+
+        <div class="contact-info">
+          <div class="contact-item">
+            <h3>Service Areas</h3>
+            <p>
+              📍 <strong>Bountiful • Kaysville • Farmington</strong><br />Woods Cross • Centerville
+              • Layton<br />And surrounding areas
+            </p>
+          </div>
+          <div class="contact-item">
+            <h3>Current Specials</h3>
+            <p>
+              🎯 <strong>$199 Summer Sale Full Detail</strong><br />🛡️ Ceramic Coating from $499<br />📱
+              10% off first service
+            </p>
+          </div>
+          <div class="contact-item">
+            <h3>Business Hours</h3>
+            <p>
+              Monday - Saturday: 8AM - 6PM<br />Sunday: By appointment<br />📞 Emergency services
+              available
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p>
+          &copy; 2025 Tsukiko Mobile Auto Detailing. All rights reserved. | Professional Mobile Car
+          Care Services
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault()
+          const target = document.querySelector(this.getAttribute('href'))
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            })
+          }
+        })
+      })
+
+      // Add scroll effect to header
+      window.addEventListener('scroll', () => {
+        const header = document.querySelector('.header')
+        if (window.scrollY > 100) {
+          header.style.background = 'rgba(10, 10, 10, 0.98)'
+        } else {
+          header.style.background = 'rgba(10, 10, 10, 0.95)'
+        }
+      })
+
+      // Animate cards on scroll
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px',
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.style.animation = 'fadeInUp 0.6s ease forwards'
+          }
+        })
+      }, observerOptions)
+
+      document
+        .querySelectorAll('.feature-card, .service-card, .testimonial-card')
+        .forEach((card) => {
+          card.style.opacity = '0'
+          card.style.transform = 'translateY(30px)'
+          observer.observe(card)
+        })
+    </script>
+  </body>
+</html>
