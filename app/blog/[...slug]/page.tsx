@@ -13,6 +13,7 @@ import PostBanner from '@/layouts/PostBanner'
 import { Metadata } from 'next'
 import siteMetadata from '@/data/siteMetadata'
 import { notFound } from 'next/navigation'
+import { extractFirstImage, processImageUrl } from '@/lib/extractFirstImage'
 
 const defaultLayout = 'PostLayout'
 const layouts = {
@@ -39,13 +40,21 @@ export async function generateMetadata(props: {
   const publishedAt = new Date(post.date).toISOString()
   const modifiedAt = new Date(post.lastmod || post.date).toISOString()
   const authors = authorDetails.map((author) => author.name)
+
+  // Extract first image from content if no images are specified in frontmatter
   let imageList = [siteMetadata.socialBanner]
   if (post.images) {
     imageList = typeof post.images === 'string' ? [post.images] : post.images
+  } else {
+    // Try to extract first image from the post content
+    const firstImage = extractFirstImage(post.body.raw)
+    if (firstImage) {
+      imageList = [firstImage]
+    }
   }
   const ogImages = imageList.map((img) => {
     return {
-      url: img && img.includes('http') ? img : siteMetadata.siteUrl + img,
+      url: processImageUrl(img, siteMetadata.siteUrl),
     }
   })
 
@@ -68,7 +77,7 @@ export async function generateMetadata(props: {
       card: 'summary_large_image',
       title: post.title,
       description: post.summary,
-      images: imageList,
+      images: imageList.map((img) => processImageUrl(img, siteMetadata.siteUrl)),
     },
   }
 }
